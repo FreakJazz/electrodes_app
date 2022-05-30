@@ -35,6 +35,7 @@ class Electrodes(BaseModel):
     E30: float
     E31: float
     E32: float
+    METODO: str
 
     class Config:
         orm_mode = True
