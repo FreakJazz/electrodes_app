@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -21,8 +22,11 @@ AIRTABLE_API_KEY=os.environ.get("API_KEY")
 AIRTABLE_TABLE_NAME=os.environ.get("TABLE_NAME")
 
 endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_TABLE_NAME}'
+# https://api.airtable.com/v0/appMxptalwhbXopM9/ELECTRODES
 
+endpoint = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/ELECTRODES'
 endpoint_get = f'https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/ELECTRODES'
+
 
 # 
 app = FastAPI(title= 'IA EEG',
@@ -39,7 +43,8 @@ class Data(BaseModel):
 
 @app.post('/api/electrodes/cross_validation/')
 async def analisis_cross_validation(cross: CrossValidation):
-    print(cross)
+    now = datetime.now() # current date and time
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
     solver = cross.solver
     tol = float(cross.tol)
     shrinkage = float(cross.shrinkage)
@@ -85,7 +90,7 @@ async def analisis_cross_validation(cross: CrossValidation):
                         y_train = np.concatenate((y_train, session.y), axis=0)
                     
             
-            winsorized_x = winsorize(X_train[k,:,:], limits=limit)
+            winsorized_x = winsorize(X_train[k,:,:], limits=limit) 
             normalize_x = stats.zscore(winsorized_x, axis=None)
             
             X_train = normalize_x.T
@@ -152,7 +157,7 @@ async def analisis_cross_validation(cross: CrossValidation):
     "records": [
     {
     "fields": {
-        "Date": cross.solver, 
+        "Date": date_time, 
         "E1":  accuracy[0],
         "E2":  accuracy[1],
         "E3":  accuracy[2],
