@@ -1,7 +1,10 @@
-# electrodes_app
+# Analisys for data EEG with IA backend
 electrodes_app
-
+LOCAL HOST
 uvicorn main:app --reload
+CLOUD
+python3 -m unicorn main:app
+
 
 APIS
 

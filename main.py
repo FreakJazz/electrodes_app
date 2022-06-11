@@ -1,3 +1,10 @@
+"""
+Authors: Jazmin Rodriguez Bermeo and Ivan Aguas
+Description: 
+This is a backend for EEG data with IA two methods 
+use framework FASTAPI and AIRTABLE DATABASE
+"""
+
 from datetime import datetime
 import os
 from fastapi import FastAPI
@@ -56,7 +63,7 @@ async def analisis_cross_validation(cross: CrossValidation):
     se = ['s1.mat', 's2.mat', 's3.mat', 's4.mat']
     n_correct_final = np.zeros((4, 20))
     accuracy = []
-    for k in range(32):  
+    for k in range(32):  # 32 ELECTRODES
         count = 2
         n_blocks = 20;
         limit = 0.05 
