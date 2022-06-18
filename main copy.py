@@ -49,16 +49,24 @@ class Data(BaseModel):
     class Config:
         orm_mode = True
 
-    def get_val_electrodes(cross):
+@app.post('/api/electrodes/cross_validation/')
+async def analisis_cross_validation(cross: CrossValidation):
+    now = datetime.now() # current date and time
+    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+    solver = cross.solver
+    tol = float(cross.tol)
+    shrinkage = float(cross.shrinkage)
+    count = 2
+    runs = 6
+    folder_data = 'sessions'
+    entries = os.listdir(folder_data)
+    se = ['s1.mat', 's2.mat', 's3.mat', 's4.mat']
+    n_correct_final = np.zeros((4, 20))
+    accuracy = []
+    for k in range(32):  # 32 ELECTRODES
+        count = 2
         n_blocks = 20;
         limit = 0.05 
-        count = 2
-        runs = 6
-        folder_data = 'sessions'
-        entries = os.listdir(folder_data)
-        se = ['s1.mat', 's2.mat', 's3.mat', 's4.mat']
-        n_correct_final = np.zeros((4, 20))
-        accuracy = []
         
         for s in range(4):
             session_test = se[s]
@@ -94,10 +102,10 @@ class Data(BaseModel):
             
             X_train = normalize_x.T
             
-            if cross.solver == 'svd':
-                clf = LinearDiscriminantAnalysis(solver=cross.solver, tol=cross.tol, store_covariance=False)
+            if solver == 'svd':
+                clf = LinearDiscriminantAnalysis(solver=solver, tol=tol, store_covariance=False)
             else:
-                clf = LinearDiscriminantAnalysis(solver=cross.solver, tol=cross.tol, store_covariance=False, shrinkage=cross.shrinkage)
+                clf = LinearDiscriminantAnalysis(solver=solver, tol=tol, store_covariance=False, shrinkage=shrinkage)
 
             clf.fit(X_train, y_train)
             
@@ -142,24 +150,8 @@ class Data(BaseModel):
             mean_column_session = n_correct_final.mean(axis=0)
             
             acc = mean_column_session/3
-    
-
-@app.post('/api/electrodes/cross_validation/')
-async def analisis_cross_validation(cross: CrossValidation):
-
-    now = datetime.now() # current date and time
-    date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
-    solver = cross.solver
-    tol = float(cross.tol)
-    shrinkage = float(cross.shrinkage)
-    cross = {
-        "solver":solver,
-        "tol":tol, 
-        "shrinkage":shrinkage
-    }
-
             
-    accuracy.append(np.mean(acc)*100)
+        accuracy.append(np.mean(acc)*100)
 
     print('accuracy',accuracy)
 
