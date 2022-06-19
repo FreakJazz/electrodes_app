@@ -214,7 +214,7 @@ async def analisis_cross_validation(cross: CrossValidation):
     ]
     }
   
-    # r = requests.post(endpoint, json=data, headers=headers)
+    r = requests.post(endpoint, json=data, headers=headers)
     data = accuracy
     return data
 
