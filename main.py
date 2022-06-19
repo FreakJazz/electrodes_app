@@ -54,7 +54,7 @@ async def add_process_time_header(request, call_next):
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
-    response.headers["X-Process-Time"] = str(f'{process_time:0.4f} sec')
+    response.headers["X-Process-Time"] = str(f'{process_time:0.1f} sec')
     return response
 ##############################CROSS VALIDATION##################################
 async def get_val_electrodes(cross: dict, k: int, accuracy: dict):
@@ -72,6 +72,7 @@ async def get_val_electrodes(cross: dict, k: int, accuracy: dict):
         y_test = np.empty((0))
         scores = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         n_correct = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        print(k)
         # Data Training
         for entry in session_training:
             file_selected = folder_data + '/' + entry
@@ -86,9 +87,7 @@ async def get_val_electrodes(cross: dict, k: int, accuracy: dict):
         winsorized_x = winsorize(X_train[k,:,:], limits=limit) 
         normalize_x = stats.zscore(winsorized_x, axis=None)
         X_train = normalize_x.T
-        print ("cross", k)
-        solver = cross['solver']
-        if solver == 'svd':
+        if cross['solver'] == 'svd':
             clf = LinearDiscriminantAnalysis(solver=cross['solver'], tol=cross['tol'], store_covariance=False)
         else:
             clf = LinearDiscriminantAnalysis(solver=cross['solver'], tol=cross['tol'], store_covariance=False, shrinkage=cross['shrinkage'])
@@ -133,7 +132,7 @@ async def analisis_cross_validation(cross: CrossValidation):
         "tol":tol, 
         "shrinkage":shrinkage
     }
-    accuracy = dict = {}
+    accuracy : dict = {}
     await asyncio.gather(get_val_electrodes(cross, 0, accuracy)
                         , get_val_electrodes(cross, 1, accuracy)
                         , get_val_electrodes(cross, 2, accuracy)
@@ -168,7 +167,6 @@ async def analisis_cross_validation(cross: CrossValidation):
                         , get_val_electrodes(cross, 31, accuracy))
 
     print('accuracy',accuracy)
-
     headers = {
     "Authorization": f"Bearer {AIRTABLE_API_KEY}",
     "Content-Type": "application/json"
@@ -216,7 +214,7 @@ async def analisis_cross_validation(cross: CrossValidation):
     ]
     }
   
-    r = requests.post(endpoint, json=data, headers=headers)
+    # r = requests.post(endpoint, json=data, headers=headers)
     data = accuracy
     return data
 
@@ -327,6 +325,41 @@ async def analisis_cross_validation(porcentage: Porcentage):
         acc = mean_column_session
         
         accuracy.append(np.mean(acc)*100)
+    accuracy = {
+        "0":  accuracy[0],
+        "1":  accuracy[1],
+        "2":  accuracy[2],
+        "3":  accuracy[3],
+        "4":  accuracy[4],
+        "5":  accuracy[5],
+        "6":  accuracy[6],
+        "7":  accuracy[7],
+        "8":  accuracy[8],
+        "9":  accuracy[9],
+        "10": accuracy[10],
+        "11": accuracy[11],
+        "12": accuracy[12],
+        "13": accuracy[13],
+        "14": accuracy[14],
+        "15": accuracy[15],
+        "16": accuracy[16],
+        "17": accuracy[17],
+        "18": accuracy[18],
+        "19": accuracy[19],
+        "20": accuracy[20],
+        "21": accuracy[21],
+        "22": accuracy[22],
+        "23": accuracy[23],
+        "24": accuracy[24],
+        "25": accuracy[25],
+        "26": accuracy[26],
+        "27": accuracy[27],
+        "28": accuracy[28],
+        "29": accuracy[29],
+        "30": accuracy[30],
+        "31": accuracy[31],
+    }
+
     headers = {
     "Authorization": f"Bearer {AIRTABLE_API_KEY}",
     "Content-Type": "application/json"
@@ -336,44 +369,43 @@ async def analisis_cross_validation(porcentage: Porcentage):
     {
     "fields": {
         "Date": date_time, 
-        "E1":  accuracy[0],
-        "E2":  accuracy[1],
-        "E3":  accuracy[2],
-        "E4":  accuracy[3],
-        "E5":  accuracy[4],
-        "E6":  accuracy[5],
-        "E7":  accuracy[6],
-        "E8":  accuracy[7],
-        "E9":  accuracy[8],
-        "E10": accuracy[9],
-        "E11": accuracy[10],
-        "E12": accuracy[11],
-        "E13": accuracy[12],
-        "E14": accuracy[13],
-        "E15": accuracy[14],
-        "E16": accuracy[15],
-        "E17": accuracy[16],
-        "E18": accuracy[17],
-        "E19": accuracy[18],
-        "E20": accuracy[19],
-        "E21": accuracy[20],
-        "E22": accuracy[21],
-        "E23": accuracy[22],
-        "E24": accuracy[23],
-        "E25": accuracy[24],
-        "E26": accuracy[25],
-        "E27": accuracy[26],
-        "E28": accuracy[27],
-        "E29": accuracy[28],
-        "E30": accuracy[29],
-        "E31": accuracy[30],
-        "E32": accuracy[31],
+        "E1":  accuracy["0"],
+        "E2":  accuracy["1"],
+        "E3":  accuracy["2"],
+        "E4":  accuracy["3"],
+        "E5":  accuracy["4"],
+        "E6":  accuracy["5"],
+        "E7":  accuracy["6"],
+        "E8":  accuracy["7"],
+        "E9":  accuracy["8"],
+        "E10": accuracy["9"],
+        "E11": accuracy["10"],
+        "E12": accuracy["11"],
+        "E13": accuracy["12"],
+        "E14": accuracy["13"],
+        "E15": accuracy["14"],
+        "E16": accuracy["15"],
+        "E17": accuracy["16"],
+        "E18": accuracy["17"],
+        "E19": accuracy["18"],
+        "E20": accuracy["19"],
+        "E21": accuracy["20"],
+        "E22": accuracy["21"],
+        "E23": accuracy["22"],
+        "E24": accuracy["23"],
+        "E25": accuracy["24"],
+        "E26": accuracy["25"],
+        "E27": accuracy["26"],
+        "E28": accuracy["27"],
+        "E29": accuracy["28"],
+        "E30": accuracy["29"],
+        "E31": accuracy["30"],
+        "E32": accuracy["31"],
         "METODO": "PORCENTAJE"
     }
     }
     ]
-    }      
-    
+    }  
     r = requests.post(endpoint, json=data, headers=headers)
     data = accuracy
     return data
